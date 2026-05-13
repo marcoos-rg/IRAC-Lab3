@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Grupo 4 IRAC - Part 5.1</title>
+
+  <link rel="stylesheet" href="styles.css">
+
+  <script src="dash.all.min.js"></script>
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <h1>Grupo 4 IRAC</h1>
+  <h2>Optional Part 5.1 - Widevine / PlayReady DRM</h2>
+
+  <div class="video-container">
+    <video id="videoPlayer" class="dashjs-player" controls autoplay muted></video>
+  </div>
+
+  <div class="info-box">
+    <p><strong>Manifest:</strong> <span id="manifestInfo">Not loaded</span></p>
+    <p><strong>Status:</strong> <span id="statusInfo">Waiting for initialization...</span></p>
+    <p><strong>DRM:</strong> <span id="drmInfo">Widevine / PlayReady</span></p>
+  </div>
+
+  <div class="notes-box">
+    <h3>Configuration notes</h3>
+    <ul>
+      <li>Edit <code>script.js</code> and replace the manifest URL with your protected DASH stream.</li>
+      <li>Replace the Axinom token placeholder with a valid <code>X-AxDRM-Message</code> token.</li>
+      <li>For Widevine tests, use Chrome or Edge.</li>
+      <li>For PlayReady tests, Edge on Windows is usually the best option.</li>
+    </ul>
+  </div>
+</body>
+</html>
