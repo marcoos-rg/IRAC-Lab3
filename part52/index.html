@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>DASH DRM - License Server</title>
+  <script src="dash.all.min.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; background: #1a1a1a; color: #fff; }
+    h2 { color: #4fc3f7; }
+    input { padding: 8px; margin: 5px; border-radius: 4px; border: 1px solid #4fc3f7; background: #333; color: #fff; }
+    button { padding: 8px 18px; background: #4fc3f7; color: #000; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
+    #status { margin: 10px 0; padding: 10px; border-radius: 4px; }
+    .ok { background: #1b5e20; }
+    .error { background: #b71c1c; }
+    #player { display: none; margin-top: 15px; }
+    .metrics { background: #2a2a2a; padding: 10px; border-radius: 6px; margin-top: 8px; }
+    #log { margin-top: 15px; background: #0d0d0d; border: 1px solid #4fc3f7; border-radius: 6px; padding: 12px; font-family: monospace; font-size: 13px; min-height: 80px; }
+    #log p { margin: 3px 0; }
+    .log-ok { color: #69f0ae; }
+    .log-err { color: #ff5252; }
+    .log-info { color: #4fc3f7; }
+    .log-key { color: #ffd740; word-break: break-all; }
+  </style>
+</head>
+<body>
+  <h2>DASH DRM Player - License Server</h2>
+  <div id="login">
+    <h3>Login</h3>
+    <input id="user" type="text" placeholder="Username" value="user1"/><br>
+    <input id="pass" type="password" placeholder="Password" value="pass1"/><br><br>
+    <button onclick="requestLicense()">Get License and Play</button>
+    <div id="status"></div>
+  </div>
+  <div id="log">
+    <p class="log-info">[LICENSE LOG] Waiting for request...</p>
+  </div>
+  <div id="player">
+    <video autoplay controls preload="auto" muted width="640"></video>
+    <div class="metrics">
+      <p>Bitrate: <span id="bitrate">-</span> kbps</p>
+      <p>Buffer: <span id="buffer">-</span> seconds</p>
+      <p>Representation: <span id="representation">-</span></p>
+    </div>
+  </div>
+  <script>
+    var FAKE_KEYS = { "oW5AK5BW43HzbTSKpiu3SQ": "AAAAAAAAAAAAAAAAAAAAAA" };
+    function addLog(msg, cls) {
+      var log = document.getElementById('log');
+      var p = document.createElement('p');
+      p.className = cls || 'log-info';
+      p.innerText = '[' + new Date().toLocaleTimeString() + '] ' + msg;
+      log.appendChild(p);
+    }
+    function requestLicense() {
+      var user = document.getElementById('user').value;
+      var pass = document.getElementById('pass').value;
+      var status = document.getElementById('status');
+      status.className = '';
+      status.innerText = 'Requesting license...';
+      addLog('User "' + user + '" requesting license from server...', 'log-info');
+      fetch('http://127.0.0.1:8001/get-license', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user: user, password: pass })
+      })
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        if (data.status === 'ok') {
+          status.className = 'ok';
+          status.innerText = 'License granted! Playing video...';
+          addLog('License GRANTED for user "' + user + '"', 'log-ok');
+          var keys = data.clearkeys;
+          for (var kid in keys) {
+            addLog('KID: ' + kid, 'log-key');
+            addLog('KEY: ' + keys[kid], 'log-key');
+          }
+          playVideo(keys);
+        } else {
+          status.className = 'error';
+          status.innerText = 'Access denied - playing corrupted video';
+          addLog('License DENIED for user "' + user + '"', 'log-err');
+          addLog('No valid key received - using fake key', 'log-err');
+          addLog('KID: oW5AK5BW43HzbTSKpiu3SQ', 'log-key');
+          addLog('KEY: AAAAAAAAAAAAAAAAAAAAAA (FAKE)', 'log-err');
+          addLog('Video will be corrupted/unreadable', 'log-err');
+          playVideo(FAKE_KEYS);
+        }
+      })
+      .catch(function(e) {
+        status.className = 'error';
+        status.innerText = 'Error: ' + e;
+        addLog('ERROR connecting to license server: ' + e, 'log-err');
+      });
+    }
+    function playVideo(clearkeys) {
+      document.getElementById('player').style.display = 'block';
+      var video = document.querySelector('video');
+      var protData = { "org.w3.clearkey": { "clearkeys": clearkeys } };
+      var player = dashjs.MediaPlayer().create();
+      player.initialize(video, './output_drm/stream.mpd', true);
+      player.setProtectionData(protData);
+      addLog('Player initialized with DRM protection', 'log-info');
+      setInterval(function () {
+        try {
+          var streamInfo = player.getActiveStream().getStreamInfo();
+          var dashMetrics = player.getDashMetrics();
+          var dashAdapter = player.getDashAdapter();
+          if (dashMetrics && streamInfo) {
+            var repSwitch = dashMetrics.getCurrentRepresentationSwitch('video', true);
+            var bufferLevel = dashMetrics.getCurrentBufferLevel('video', true);
+            var bitrate = repSwitch ? Math.round(dashAdapter.getBandwidthForRepresentation(repSwitch.to, streamInfo.index) / 1000) : 0;
+            document.getElementById('buffer').innerText = bufferLevel;
+            document.getElementById('bitrate').innerText = bitrate;
+            document.getElementById('representation').innerText = repSwitch ? repSwitch.to : '-';
+          }
+        } catch(e) {}
+      }, 500);
+    }
+  </script>
+</body>
+</html>
