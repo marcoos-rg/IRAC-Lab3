@@ -5,7 +5,7 @@ This is the implementation of the optional part 5.2 of Practice 3.
 A REST API license server is implemented in Python that dynamically delivers DRM decryption keys only to authorized users.
 
 ## Files
-- `index_p5.html` - DASH client with login and dynamic license request
+- `index.html` - DASH client with login and dynamic license request
 - `license_server.py` - REST API license server (port 8001)
 - `output_drm/` - DASH segments and MPD (MPEG-CENC encrypted)
 
@@ -37,7 +37,7 @@ python3 -m http.server 8000 &
 ```
 
 ### Access
-- DRM License Player: http://localhost:8000/index_p5.html
+- DRM License Player: http://localhost:8000/index.html
 - License Server API: http://localhost:8001/get-license
 
 ### Regenerate video files

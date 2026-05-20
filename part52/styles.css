@@ -1,0 +1,15 @@
+body { font-family: Arial, sans-serif; margin: 20px; background: #1a1a1a; color: #fff; }
+h2 { color: #4fc3f7; }
+input { padding: 8px; margin: 5px; border-radius: 4px; border: 1px solid #4fc3f7; background: #333; color: #fff; }
+button { padding: 8px 18px; background: #4fc3f7; color: #000; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
+#status { margin: 10px 0; padding: 10px; border-radius: 4px; }
+.ok { background: #1b5e20; }
+.error { background: #b71c1c; }
+#player { display: none; margin-top: 15px; }
+.metrics { background: #2a2a2a; padding: 10px; border-radius: 6px; margin-top: 8px; }
+#log { margin-top: 15px; background: #0d0d0d; border: 1px solid #4fc3f7; border-radius: 6px; padding: 12px; font-family: monospace; font-size: 13px; min-height: 80px; }
+#log p { margin: 3px 0; }
+.log-ok { color: #69f0ae; }
+.log-err { color: #ff5252; }
+.log-info { color: #4fc3f7; }
+.log-key { color: #ffd740; word-break: break-all; }
