@@ -1,0 +1,56 @@
+body {
+  font-family: Arial, sans-serif;
+  margin: 20px;
+  text-align: center;
+  background: #f5f5f5;
+}
+
+h1 {
+  margin-bottom: 20px;
+}
+
+.video-container {
+  width: 80vw;
+  margin: 0 auto 20px auto;
+  background: white;
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+video {
+  width: 100%;
+  height: auto;
+}
+
+.metrics {
+  margin: 20px auto;
+  width: 80vw;
+  background: white;
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.metrics p {
+  margin: 8px 0;
+}
+
+.charts {
+  width: 80vw;
+  margin: 20px auto;
+}
+
+.chart-box {
+  background: white;
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+canvas {
+  max-height: 400px;
+}
+
+
+

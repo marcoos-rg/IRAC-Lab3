@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Grupo 4 IRAC</title>
+  <script src="dash.all.min.js"></script>
+  <style>
+    .video-container {
+      width: 80vw;
+      margin: 0 auto;
+    }
+
+    .dashjs-player {
+      width: 100%;
+      height: auto;
+    }
+  </style>
+</head>
+<body>
+  <h1>Grupo 4 IRAC</h1>
+
+  <div class="video-container">
+    <video class="dashjs-player" autoplay controls preload="auto">
+      <source src="https://dash.akamaized.net/envivio/EnvivioDash3/manifest.mpd" type="application/dash+xml">
+    </video>
+  </div>
+
+  <script>
+    var player;
+    document.addEventListener("DOMContentLoaded", function () {
+      init();
+    });
+
+    function init() {
+      player = dashjs.MediaPlayerFactory.create(
+        document.querySelector(".dashjs-player")
+      );
+    };
+  </script>
+</body>
+</html>

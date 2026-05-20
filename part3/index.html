@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Grupo 4 IRAC</title>
+  <script src="dash.all.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 30px;
+      text-align: center;
+    }
+
+    .video-container {
+      width: 80vw;
+      margin: 0 auto 20px auto;
+    }
+
+    .dashjs-player {
+      width: 100%;
+      height: auto;
+    }
+
+    .metrics {
+      margin-top: 20px;
+      font-size: 18px;
+    }
+
+    .metrics p {
+      margin: 8px 0;
+    }
+  </style>
+</head>
+<body>
+  <h1>Grupo 4 IRAC</h1>
+
+  <div class="video-container">
+    <video class="dashjs-player" autoplay controls preload="auto" muted></video>
+  </div>
+
+  <div class="metrics">
+    <p>Video Bitrate: <span id="bitrate"></span> kbps</p>
+    <p>Video Buffer: <span id="buffer"></span> seconds</p>
+    <p>Video Representation: <span id="representation"></span></p>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      init();
+    });
+
+    function init() {
+      const protData = {
+        "org.w3.clearkey": {
+          "clearkeys": {
+           "oW5AK5BW43HzbTSKpiu3SQ": "hyN9IKGfWKdAwFaE5pm0qg"         	
+          }
+        }
+      };
+
+      var video = document.querySelector("video");
+      var player = dashjs.MediaPlayer().create();
+      var mpd_url = "./output_drm/stream.mpd";
+
+      player.setProtectionData(protData);
+      player.initialize(video, mpd_url, true);
+
+      player.on(dashjs.MediaPlayer.events.PLAYBACK_ENDED, function () {
+        clearInterval(eventPoller);
+      });
+
+      var eventPoller = setInterval(function () {
+        var activeStream = player.getActiveStream();
+        if (!activeStream) return;
+
+        var streamInfo = activeStream.getStreamInfo();
+        var dashMetrics = player.getDashMetrics();
+        var dashAdapter = player.getDashAdapter();
+
+        if (dashMetrics && streamInfo) {
+          const periodIdx = streamInfo.index;
+          var repSwitch = dashMetrics.getCurrentRepresentationSwitch("video", true);
+          var bufferLevel = dashMetrics.getCurrentBufferLevel("video", true);
+          var bitrate = repSwitch
+            ? Math.round(dashAdapter.getBandwidthForRepresentation(repSwitch.to, periodIdx) / 1000)
+            : NaN;
+
+          document.getElementById("buffer").innerText =
+            bufferLevel ? bufferLevel.toFixed(2) + " secs" : "N/A";
+
+          document.getElementById("bitrate").innerText =
+            isNaN(bitrate) ? "N/A" : bitrate + " Kbps";
+
+          document.getElementById("representation").innerText =
+            repSwitch ? repSwitch.to : "N/A";
+        }
+      }, 500);
+    }
+  </script>
+</body>
+</html>
